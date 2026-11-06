@@ -32,31 +32,41 @@
 3. रिपॉज़िटरी में **Settings → Pages** खोलें। *Source* में **Deploy from a branch**, ब्रांच **main** और फ़ोल्डर **/ (root)** चुनें, फिर **Save** करें।
 4. एक-दो मिनट बाद ऐप `https://<your-username>.github.io/prashasnik-shabdavali/` पर खुल जाएगा।
 
-स्थानीय रूप से देखने के लिए `index.html` को सीधे ब्राउज़र में खोल सकते हैं।
-*To try it locally, just open `index.html` in a browser.*
+## शब्द सूची बदलना / Updating the words
 
-## शब्द सूची बदलना / Updating the word list
+ऐप सीधे रिपॉज़िटरी में रखी Excel फ़ाइल **`Official_Hindi_Words_English_Meanings.xlsx`** से शब्द पढ़ता है। शब्द जोड़ने, हटाने या सुधारने के लिए:
 
-शब्द `data/Official_Hindi_Words_English_Meanings.xlsx` (शीट *Glossary*) में हैं। ऐप `data/words.js` पढ़ता है, जो इसी Excel फ़ाइल से बनती है। शब्द जोड़ने या सुधारने के लिए:
+1. Excel फ़ाइल में बदलाव करें और उसे **इसी नाम** से सहेजें।
+2. GitHub पर रिपॉज़िटरी खोलें → **Add file → Upload files** → फ़ाइल चुनें → **Commit changes**।
+3. कुछ मिनट में ऐप नई सूची दिखाने लगेगा (GitHub Pages को अपडेट होने में 1–10 मिनट लगते हैं)।
 
+*The app reads its words directly from the Excel file in the repository. Edit the spreadsheet, keep the same file name, and upload it to the repository (Add file → Upload files → Commit). The site picks up the new list within a few minutes — nothing else needs to change.*
+
+**Excel फ़ाइल के नियम / Spreadsheet rules**
+
+- शब्द **Glossary** नाम की शीट में हों; यह शीट न हो तो पहली शीट पढ़ी जाती है।
+- पहली पंक्ति में शीर्षक हों। ऐप कॉलम उनके शीर्षक से पहचानता है — जिसमें **Hindi** (या हिंदी) लिखा हो, जिसमें **English** लिखा हो, और जिसमें **Category** लिखा हो। कॉलम का क्रम बदला जा सकता है और नए कॉलम जोड़े जा सकते हैं।
+- एक शब्द के कई अर्थ अर्धविराम (;) से अलग करें, जैसे `Sanction; Approval`।
+- खाली पंक्तियाँ और दोबारा आए हिंदी शब्द अपने-आप छोड़ दिए जाते हैं।
+- शब्दों की संख्या बदलने पर दैनिक शब्दों का क्रम भी बदल जाता है।
+
+*Words go in a sheet named "Glossary" (otherwise the first sheet). Columns are found by their headings — one containing "Hindi", one containing "English", and optionally one containing "Category" — so they can be in any order. Separate multiple meanings with semicolons. Blank rows and repeated Hindi terms are skipped. Adding or removing words reshuffles the daily order.*
+
+**कंप्यूटर पर जाँचना / Previewing locally:** ब्राउज़र सुरक्षा कारणों से सीधे खोली गई (डबल-क्लिक) फ़ाइल से Excel नहीं पढ़ने देता। इसलिए फ़ोल्डर में यह चलाएँ और `http://localhost:8000` खोलें:
 ```bash
-pip install openpyxl
-python scripts/xlsx_to_words.py
+python -m http.server 8000
 ```
-
-फिर दोनों फ़ाइलें commit करें। ध्यान दें: शब्दों की संख्या बदलने पर दैनिक क्रम भी बदल जाता है।
-*Edit the spreadsheet, run the script, and commit both files. Changing the number of words reshuffles the daily order.*
+*Browsers don't allow a page opened by double-clicking to read files, so preview with a local web server as above.*
 
 ## फ़ाइलें / Files
 
 | फ़ाइल | काम |
 |---|---|
+| `Official_Hindi_Words_English_Meanings.xlsx` | शब्द सूची — इसे बदलकर अपलोड करें |
 | `index.html` | ऐप का पृष्ठ |
 | `style.css` | रूप-सज्जा (डार्क मोड सहित) |
 | `app.js` | दैनिक शब्द चयन, खोज, प्रगति |
-| `data/words.js` | शब्द सूची (Excel से बनी) |
-| `data/Official_Hindi_Words_English_Meanings.xlsx` | मूल शब्द सूची |
-| `scripts/xlsx_to_words.py` | Excel → `words.js` |
+| `xlsx-reader.js` | ब्राउज़र में Excel फ़ाइल पढ़ने वाला कोड (किसी बाहरी लाइब्रेरी के बिना) |
 | `manifest.webmanifest`, `sw.js`, `assets/icon.svg` | इंस्टॉल और ऑफ़लाइन सुविधा |
 
 ## अस्वीकरण / Disclaimer

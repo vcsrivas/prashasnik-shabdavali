@@ -1,0 +1,12 @@
+{
+  "name": "प्रशासनिक शब्दावली",
+  "short_name": "शब्दावली",
+  "description": "हर दिन 5 राजभाषा (प्रशासनिक हिंदी) शब्द, अंग्रेज़ी अर्थ के साथ",
+  "lang": "hi",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#f5f7fa",
+  "theme_color": "#1f4e78",
+  "icons": [{ "src": "assets/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }]
+}

@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>प्रशासनिक शब्दावली — रोज़ 5 शब्द</title>
+  <meta name="description" content="प्रशासनिक शब्दावली: हर दिन 5 राजभाषा (प्रशासनिक हिंदी) शब्द, उनके अंग्रेज़ी अर्थ के साथ।">
+  <meta name="theme-color" content="#1f4e78">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='22' fill='%231f4e78'/><text x='50' y='70' font-size='60' text-anchor='middle' fill='white' font-family='sans-serif'>श</text></svg>">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400;600;700&family=Noto+Serif+Devanagari:wght@600;700&display=swap" rel="stylesheet">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="apple-touch-icon" href="assets/icon.svg">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <h1 class="app-title">प्रशासनिक शब्दावली</h1>
+      <p class="tagline">हर दिन 5 नए राजभाषा शब्द &middot; <span lang="en">5 official Hindi words a day</span></p>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="day-nav" aria-label="दिन चुनें">
+      <button id="prevDay" class="nav-btn" aria-label="पिछला दिन">&larr; <span>पिछला</span></button>
+      <div class="day-info">
+        <div id="dateHi" class="date-hi"></div>
+        <div id="dateEn" class="date-en" lang="en"></div>
+      </div>
+      <button id="nextDay" class="nav-btn" aria-label="अगला दिन"><span>अगला</span> &rarr;</button>
+    </nav>
+    <div class="today-row">
+      <button id="todayBtn" class="link-btn" hidden>आज के शब्दों पर लौटें</button>
+    </div>
+
+    <section id="cards" class="cards" aria-live="polite"></section>
+
+    <section class="progress-box" aria-label="प्रगति">
+      <div class="progress-text">
+        <span id="progressLabel"></span>
+      </div>
+      <div class="bar"><div id="progressBar" class="bar-fill"></div></div>
+    </section>
+
+    <section class="search-box">
+      <h2>हिंदी शब्द खोजें <span lang="en">/ Find the Hindi word</span></h2>
+      <p class="search-help">अंग्रेज़ी शब्द लिखें और उसका हिंदी पर्याय देखें। हिंदी शब्द लिखकर उसका अंग्रेज़ी अर्थ भी खोज सकते हैं।<br><span lang="en">Type an English word to get its Hindi equivalent — e.g. <em>approval</em>, <em>leave</em>, <em>tender</em>.</span></p>
+      <label for="search" class="sr-only">English word</label>
+      <input id="search" type="search" lang="en" placeholder="English word, e.g. approval / अनुमोदन" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search">
+      <ul id="results" class="results"></ul>
+    </section>
+
+    <aside class="disclaimer" role="note">
+      <h2>अस्वीकरण <span lang="en">/ Disclaimer</span></h2>
+      <p>इस ऐप के शब्द और उनके अर्थ कृत्रिम बुद्धिमत्ता (AI) की सहायता से संकलित किए गए हैं। यद्यपि शब्दों और अर्थों की शुद्धता का ध्यान रखा गया है, फिर भी पाठकों से सावधानी अपेक्षित है। आधिकारिक प्रयोग से पहले कृपया वैज्ञानिक तथा तकनीकी शब्दावली आयोग (CSTT) की प्रशासनिक शब्दावली या संबंधित विभाग के मानक स्रोत से मिलान कर लें।</p>
+      <p lang="en">The words and meanings in this app have been compiled using AI. Although care has been taken that the words and meanings are correct, readers' caution is necessitated. Please verify against the Commission for Scientific and Technical Terminology (CSTT) administrative glossary or your department's standard source before official use.</p>
+    </aside>
+  </main>
+
+  <footer class="site-footer">
+    <div class="wrap">
+      <span id="totalWords"></span> &middot; हर दिन नए शब्द, भारतीय समयानुसार मध्यरात्रि से
+    </div>
+  </footer>
+
+  <script src="xlsx-reader.js"></script>
+  <script src="app.js"></script>
+  <script>
+    if ("serviceWorker" in navigator && location.protocol.startsWith("http")) {
+      navigator.serviceWorker.register("sw.js").catch(() => {});
+    }
+  </script>
+</body>
+</html>
