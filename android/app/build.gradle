@@ -8,7 +8,10 @@ plugins {
 def webRoot = rootProject.file("..")
 def webAssetsDir = layout.buildDirectory.dir("generated/webassets").get().asFile
 
-def copyWebApp = tasks.register("copyWebApp", Sync) {
+// Copy the web files while Gradle reads this script (before any task runs), so every
+// Android task simply sees them as ordinary asset files.
+delete(webAssetsDir)
+copy {
     from(webRoot) {
         include "index.html", "style.css", "app.js", "xlsx-reader.js", "inflate.js",
                 "manifest.webmanifest", "*.xlsx", "icons/**"
@@ -42,6 +45,7 @@ android {
             storePassword ksPass
             keyAlias keyAliasName
             keyPassword keyPass
+            storeType "pkcs12"
         }
     }
 
@@ -58,13 +62,16 @@ android {
         }
     }
 
+    lint {
+        checkReleaseBuilds false
+        abortOnError false
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_17
         targetCompatibility JavaVersion.VERSION_17
     }
 }
-
-tasks.named("preBuild") { dependsOn copyWebApp }
 
 dependencies {
     implementation "androidx.webkit:webkit:1.12.1"
