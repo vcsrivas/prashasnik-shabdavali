@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>प्रशासनिक शब्दावली</title>
+  <meta name="description" content="प्रशासनिक शब्दावली — रोज़ 6 राजभाषा (प्रशासनिक हिंदी) शब्द, अंग्रेज़ी अर्थ और विषय के साथ।">
+  <meta name="theme-color" content="#5b2a12">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-title" content="शब्दावली">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="icons/icon-192.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="app-bar">
+    <img src="icons/icon.svg" alt="" class="app-logo" width="40" height="40">
+    <div class="app-names">
+      <h1>प्रशासनिक शब्दावली</h1>
+      <p lang="en">Administrative Hindi · 6 words a day</p>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- आज / Today -->
+    <section id="view-today" class="view" aria-labelledby="t-today">
+      <div class="day-head">
+        <h2 id="t-today">आज के शब्द</h2>
+        <p id="todayDate" class="date-line"></p>
+      </div>
+      <div id="todayCards" class="cards"></div>
+      <aside class="disclaimer" role="note">
+        <h3>अस्वीकरण <span lang="en">/ Disclaimer</span></h3>
+        <p>यद्यपि शब्दों और उनके अर्थों की शुद्धता का पूरा ध्यान रखा गया है, फिर भी यह शब्द-सूची कृत्रिम बुद्धिमत्ता (AI) की सहायता से तैयार की गई है, अतः उपयोगकर्ता अपने स्तर पर अर्थ का सत्यापन करने में उचित सावधानी बरतें।</p>
+        <p lang="en">Although due care has been taken for the correctness of words and meanings, as the word list is made using AI, due caution is needed at the users' end to verify the meaning.</p>
+      </aside>
+    </section>
+
+    <!-- इतिहास / History -->
+    <section id="view-history" class="view" hidden aria-labelledby="t-history">
+      <div class="day-head">
+        <h2 id="t-history">इतिहास</h2>
+        <p class="date-line">किसी शब्द को छूकर उसका अर्थ याद करें <span lang="en">· Tap a word to recall its meaning</span></p>
+      </div>
+      <div id="historyList" class="history"></div>
+    </section>
+
+    <!-- खोज / Search -->
+    <section id="view-search" class="view" hidden aria-labelledby="t-search">
+      <div class="day-head">
+        <h2 id="t-search">शब्द खोजें</h2>
+        <p class="date-line">अंग्रेज़ी में लिखें, सुझाव में से शब्द चुनें <span lang="en">· Type in English and pick a suggestion</span></p>
+      </div>
+      <div class="search-wrap">
+        <input id="searchInput" type="search" lang="en" placeholder="e.g. approval, leave, tender…"
+               autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search"
+               role="combobox" aria-expanded="false" aria-controls="suggestions" aria-autocomplete="list">
+        <ul id="suggestions" class="suggestions" role="listbox" hidden></ul>
+      </div>
+      <div id="searchResult" class="cards"></div>
+      <p id="searchHint" class="hint">उदाहरण: <button class="chip-btn" data-q="approval">approval</button>
+        <button class="chip-btn" data-q="leave">leave</button> <button class="chip-btn" data-q="tender">tender</button>
+        <button class="chip-btn" data-q="pension">pension</button> <button class="chip-btn" data-q="notification">notification</button></p>
+    </section>
+
+    <!-- जानकारी / About -->
+    <section id="view-about" class="view" hidden aria-labelledby="t-about">
+      <div class="day-head"><h2 id="t-about">जानकारी</h2></div>
+      <div class="about">
+        <img src="icons/icon.svg" alt="पुराने सरकारी कार्यालय भवन का चित्र" width="96" height="96">
+        <p>यह ऐप हर दिन सरकारी कामकाज में प्रयुक्त होने वाले <strong>6 नए प्रशासनिक हिंदी शब्द</strong>, उनके अंग्रेज़ी अर्थ और विषय के साथ दिखाता है। पिछले दिनों के शब्द <strong>इतिहास</strong> में दिन-वार सुरक्षित रहते हैं।</p>
+        <p lang="en">Every day the app picks 6 new words at random from the word list. Words already shown are not repeated until the whole list has been covered. Your history is stored only on this device.</p>
+        <p id="aboutStats" class="stats"></p>
+        <p id="apkBox" hidden><a id="apkLink" class="apk-btn" href="#">📲 Android ऐप डाउनलोड करें <span lang="en">(APK)</span></a></p>
+        <aside class="disclaimer" role="note">
+          <h3>अस्वीकरण <span lang="en">/ Disclaimer</span></h3>
+          <p>यद्यपि शब्दों और उनके अर्थों की शुद्धता का पूरा ध्यान रखा गया है, फिर भी यह शब्द-सूची कृत्रिम बुद्धिमत्ता (AI) की सहायता से तैयार की गई है, अतः उपयोगकर्ता अपने स्तर पर अर्थ का सत्यापन करने में उचित सावधानी बरतें।</p>
+          <p lang="en">Although due care has been taken for the correctness of words and meanings, as the word list is made using AI, due caution is needed at the users' end to verify the meaning.</p>
+        </aside>
+      </div>
+    </section>
+  </main>
+
+  <nav class="tab-bar" aria-label="मुख्य मेनू">
+    <a href="#today" data-tab="today"><span class="ti" aria-hidden="true">📅</span><span>आज</span></a>
+    <a href="#history" data-tab="history"><span class="ti" aria-hidden="true">🕘</span><span>इतिहास</span></a>
+    <a href="#search" data-tab="search"><span class="ti" aria-hidden="true">🔍</span><span>खोज</span></a>
+    <a href="#about" data-tab="about"><span class="ti" aria-hidden="true">ℹ️</span><span>जानकारी</span></a>
+  </nav>
+
+  <!-- Word card pop-up (from History and Search) -->
+  <div id="sheet" class="sheet" hidden>
+    <div class="sheet-backdrop" data-close></div>
+    <div class="sheet-panel" role="dialog" aria-modal="true" aria-labelledby="sheetWord">
+      <button class="sheet-close" data-close aria-label="बंद करें">✕</button>
+      <div id="sheetBody"></div>
+    </div>
+  </div>
+
+  <script src="inflate.js"></script>
+  <script src="xlsx-reader.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
