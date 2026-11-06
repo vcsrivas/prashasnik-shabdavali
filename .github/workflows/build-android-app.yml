@@ -1,0 +1,88 @@
+# Builds the Android app (APK) and publishes it on the repository's Releases page.
+# Runs automatically whenever the Excel word list or the app files change on the main branch,
+# and can also be started by hand from the Actions tab ("Run workflow").
+#
+# Latest download link:
+#   https://github.com/<your-username>/<repository>/releases/latest/download/prashasnik-shabdavali.apk
+
+name: Build Android app
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "*.xlsx"
+      - "index.html"
+      - "style.css"
+      - "app.js"
+      - "xlsx-reader.js"
+      - "inflate.js"
+      - "manifest.webmanifest"
+      - "icons/**"
+      - "android/**"
+      - ".github/workflows/build-android-app.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: android-build
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Get the repository files
+        uses: actions/checkout@v4
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: "8.11.1"
+
+      - name: Check the Excel word list
+        run: |
+          pip install --quiet openpyxl
+          python - <<'PY'
+          import glob, openpyxl
+          files = glob.glob("*.xlsx")
+          assert files, "No .xlsx word list found in the repository root"
+          wb = openpyxl.load_workbook(files[0], read_only=True)
+          ws = wb["Glossary"] if "Glossary" in wb.sheetnames else wb.worksheets[0]
+          n = sum(1 for r in ws.iter_rows(min_row=2, values_only=True) if len(r) > 2 and r[1] and r[2])
+          print(f"{files[0]}: {n} words in columns B/C")
+          assert n >= 6, "The word list needs at least 6 rows with a Hindi word (column B) and meaning (column C)"
+          PY
+
+      - name: Build the APK
+        run: gradle -p android assembleRelease --no-daemon --stacktrace
+
+      - name: Name the APK
+        run: cp android/app/build/outputs/apk/release/app-release.apk prashasnik-shabdavali.apk
+
+      - name: Publish on the Releases page
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: प्रशासनिक शब्दावली — Android app (build ${{ github.run_number }})
+          make_latest: true
+          files: prashasnik-shabdavali.apk
+          body: |
+            **Android app — प्रशासनिक शब्दावली**
+
+            On your phone, download `prashasnik-shabdavali.apk` below, open it and tap **Install**.
+            If Android asks, allow installs from your browser or Files app ("Install unknown apps").
+
+            Built automatically from the Excel word list in this repository.
+            A newer build installs over the old one and keeps your word history.
