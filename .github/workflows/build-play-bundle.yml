@@ -112,7 +112,7 @@ jobs:
             echo "::error::The bundle was not signed with your upload key, so it was not published."
             exit 1
           fi
-          OUT="prashasnik-shabdavali-v${APP_VERSION_CODE}.aab"
+          OUT="prashasanik.shabdavali-v${APP_VERSION_CODE}.aab"
           cp "$AAB" "$OUT"
           echo "AAB_FILE=$OUT" >> "$GITHUB_ENV"
           rm -f "$RUNNER_TEMP/upload-keystore.jks"
