@@ -33,7 +33,7 @@ android {
     compileSdk 36
 
     defaultConfig {
-        applicationId "com.prashasnik.shabdavali"
+        applicationId "prashasanik.shabdavali"
         minSdk 24
         targetSdk 36
         // Each GitHub build gets a higher version, so a new APK installs over the old one.
