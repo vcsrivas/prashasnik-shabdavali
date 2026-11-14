@@ -106,6 +106,9 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 24px; }
 .suggestions .s-en mark { background: #f7e1b0; color: inherit; border-radius: 3px; padding: 0 1px; }
 .suggestions .s-hi { color: var(--brick); font-weight: 600; }
 .suggestions .s-none { color: var(--muted); cursor: default; }
+.suggestions .s-hi mark { background: #f7e1b0; color: inherit; border-radius: 3px; padding: 0 1px; }
+.suggestions .s-sub { font-size: .9rem; color: var(--muted); }
+.chip-btn.hi { font-family: inherit; font-size: .9rem; }
 .hint { color: var(--muted); font-size: .9rem; line-height: 2.1; }
 .chip-btn {
   border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 2px 10px;
@@ -173,7 +176,7 @@ main { max-width: 640px; margin: 0 auto; padding: 14px 14px 24px; }
   .speak, #searchInput, .suggestions, .chip-btn, .tab-bar { background: #221b15; }
   .word-chip { background: #2a2119; }
   .word-chip:hover, .suggestions li:hover, .suggestions li[aria-selected="true"] { background: #33281e; }
-  .suggestions .s-en mark { background: #6a4b1c; }
+  .suggestions .s-en mark, .suggestions .s-hi mark { background: #6a4b1c; }
   .disclaimer p:last-child { color: #d9c7ad; }
   .tab-bar a.active { color: #f0b98f; }
 }

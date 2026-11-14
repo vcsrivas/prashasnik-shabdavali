@@ -2,7 +2,7 @@
  * - Reads the word list from the Excel file: column B = Hindi, C = English meaning, D = category.
  * - Picks 6 random words each day (no repeats until the whole list has been shown).
  * - Keeps a day-wise history on the device; tap a word in history to recall its meaning.
- * - English search with live suggestions.
+ * - Search with live suggestions, in English (shows the Hindi word) or in Hindi (shows the English meaning).
  */
 (function () {
   "use strict";
@@ -196,7 +196,7 @@
   }
   window.addEventListener("hashchange", () => { closeSheet(true); showTab(); });
 
-  // ---------- English search with suggestions ----------
+  // ---------- search with suggestions (English → Hindi, or Hindi → English) ----------
   const input = $("searchInput"), sugg = $("suggestions");
   const isDevanagari = s => /[ऀ-ॿ]/.test(s);
   const norm = s => s.toLowerCase().replace(/[^a-z0-9\s'-]/g, " ").replace(/\s+/g, " ").trim();
@@ -219,26 +219,48 @@
     if (!best && fullText[i].includes(q)) best = 10;
     return best;
   }
-  function scoreHindi(w, q) {
-    if (w.h === q) return 100;
-    if (w.h.startsWith(q)) return 60 - w.h.length / 10;
-    if (w.h.includes(q)) return 30 - w.h.length / 10;
+  // Hindi is matched loosely, so small spelling differences still find the word:
+  // ज़/ज, फ़/फ (nukta), ँ/ं (chandrabindu/anusvara) and न्त/ंत (half nasal letter) count as the same,
+  // and punctuation or invisible joiners are ignored.
+  const normHi = s => s.normalize("NFD")
+    .replace(/[़‌‍]/g, "")      // nukta, zero-width joiners
+    .replace(/ँ/g, "ं")              // ँ -> ं
+    .replace(/[ङञणनम]्(?=[क-ह])/g, "ं")   // मन्त्रालय = मंत्रालय, हिन्दी = हिंदी
+    .replace(/[^ऀ-ॿ\s]|[।॥]/g, " ")   // punctuation, । ॥
+    .replace(/\s+/g, " ").trim();
+  let hiFull = [], hiParts = [];
+  function indexHindi() {
+    hiFull = words.map(w => normHi(w.h));
+    hiParts = hiFull.map(h => h.split(" "));
+  }
+  function scoreHindi(i, q) {
+    const h = hiFull[i], parts = hiParts[i], len = h.length / 10;
+    if (h === q) return 100;                                   // exact word
+    if (parts.includes(q)) return 85 - len;                    // a whole word inside a phrase: वर्ग -> अधिकारी वर्ग
+    if (h.startsWith(q)) return 70 - len;                      // beginning: अनुमो -> अनुमोदन
+    if (parts.some(p => p.startsWith(q))) return 50 - len;     // beginning of a later word
+    if (h.includes(q)) return 25 - len;                        // anywhere
     return 0;
   }
   function search(raw) {
-    const hindi = isDevanagari(raw), q = hindi ? raw.trim() : norm(raw);
+    const hindi = isDevanagari(raw), q = hindi ? normHi(raw) : norm(raw);
     if (!q || (!hindi && q.length < 2)) return [];
     const scored = [];
-    words.forEach((w, i) => { const s = hindi ? scoreHindi(w, q) : scoreEnglish(i, q); if (s > 0) scored.push([s, i]); });
-    scored.sort((a, b) => b[0] - a[0] || words[a[1]].e.length - words[b[1]].e.length);
+    words.forEach((w, i) => { const s = hindi ? scoreHindi(i, q) : scoreEnglish(i, q); if (s > 0) scored.push([s, i]); });
+    scored.sort((a, b) => b[0] - a[0] ||
+      (hindi ? words[a[1]].h.length - words[b[1]].h.length : words[a[1]].e.length - words[b[1]].e.length));
     return scored.slice(0, MAX_SUGGESTIONS).map(([, i]) => words[i]);
   }
   function highlight(el, text, q) {
-    if (!q || isDevanagari(q)) { el.textContent = text; return; }
+    if (!q) { el.textContent = text; return; }
     const m = text.toLowerCase().indexOf(q.toLowerCase());
     if (m < 0) { el.textContent = text; return; }
-    const mark = document.createElement("mark"); mark.textContent = text.slice(m, m + q.length);
-    el.append(text.slice(0, m), mark, text.slice(m + q.length));
+    let end = m + q.length;
+    // Don't cut a Hindi letter in half: keep its vowel signs, ं, ़ and any half-letter joined by ्.
+    const isMark = c => /[ऀ-ःऺ-ॏ॑-ॗॢॣ]/.test(c);
+    while (end < text.length && (isMark(text[end]) || text[end - 1] === "्")) end++;
+    const mark = document.createElement("mark"); mark.textContent = text.slice(m, end);
+    el.append(text.slice(0, m), mark, text.slice(end));
   }
 
   let current_suggestions = [], active = -1;
@@ -251,11 +273,19 @@
       const li = document.createElement("li"); li.className = "s-none";
       li.textContent = "कोई सुझाव नहीं — कोई दूसरा शब्द लिखें"; sugg.appendChild(li);
     }
+    const hindi = isDevanagari(raw);
     current_suggestions.forEach((w, i) => {
       const li = document.createElement("li"); li.role = "option"; li.id = "sg-" + i;
-      const en = document.createElement("span"); en.className = "s-en"; highlight(en, w.e, raw.trim());
-      const hi = document.createElement("span"); hi.className = "s-hi"; hi.textContent = w.h;
-      li.append(en, hi);
+      const en = document.createElement("span"); en.className = "s-en"; en.lang = "en";
+      const hi = document.createElement("span"); hi.className = "s-hi";
+      if (hindi) {
+        // Typed in Hindi: Hindi word on top (matched part marked), English meaning below.
+        highlight(hi, w.h, raw.trim()); en.textContent = w.e; en.classList.add("s-sub");
+        li.append(hi, en);
+      } else {
+        highlight(en, w.e, raw.trim()); hi.textContent = w.h;
+        li.append(en, hi);
+      }
       li.addEventListener("mousedown", e => e.preventDefault());       // keep focus in the box
       li.addEventListener("click", () => choose(i));
       sugg.appendChild(li);
@@ -272,7 +302,7 @@
   }
   function choose(i) {
     const w = current_suggestions[i]; if (!w) return;
-    input.value = w.e.split(";")[0].trim();
+    input.value = isDevanagari(input.value) ? w.h : w.e.split(";")[0].trim();
     sugg.hidden = true; input.setAttribute("aria-expanded", "false");
     const box = $("searchResult"); box.innerHTML = ""; box.appendChild(cardEl(w));
     $("searchHint").hidden = true;
@@ -317,6 +347,7 @@
       if (!words.length) throw new Error("No words found in columns B and C");
       byHindi = new Map(words.map(w => [w.h, w]));
       indexWords();
+      indexHindi();
       refreshDay();
       showTab();
     })

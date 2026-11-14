@@ -11,8 +11,8 @@
   *6 random words a day from column B, with the meaning from column C and the category from column D. No word repeats until the whole list has been shown.*
 - **इतिहास (दिन-वार)** — हर दिन के शब्द तारीख़ के साथ सुरक्षित रहते हैं। इतिहास में किसी शब्द को छूने पर उसका अर्थ और विषय दिखता है, ताकि आप अर्थ याद करके जाँच सकें।
   *Day-wise history: tap any past word to see its meaning and category again.*
-- **खोज** — अंग्रेज़ी में लिखना शुरू करें (जैसे *appro…*), सुझाव दिखेंगे; किसी सुझाव को चुनते ही उसका हिंदी शब्द-कार्ड खुलता है। हिंदी में भी खोज सकते हैं।
-  *Search in English with live suggestions; pick one to see its Hindi word card.*
+- **खोज** — अंग्रेज़ी में लिखना शुरू करें (जैसे *appro…*) तो हिंदी शब्द सुझाए जाएँगे; हिंदी में लिखें (जैसे *अनुमो…*) तो हिंदी शब्द उनके अंग्रेज़ी अर्थ के साथ सुझाए जाएँगे। सुझाव चुनते ही शब्द-कार्ड खुलता है। नुक़्ता (ज़/ज) और चंद्रबिंदु/अनुस्वार (ँ/ं) के अंतर से खोज पर फ़र्क़ नहीं पड़ता, और वाक्यांश के बीच के शब्द से भी खोज होती है (जैसे *वर्ग* → *अधिकारी वर्ग*)।
+  *Search in English to find the Hindi word, or in Hindi to find the English meaning, with live suggestions either way. Hindi search ignores nukta and chandrabindu differences and also matches words inside a phrase.*
 - बिना इंटरनेट के चलता है। इतिहास केवल आपके फ़ोन में रहता है।
   *Works offline. History is stored only on your phone.*
 

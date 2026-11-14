@@ -1,6 +1,6 @@
 // Offline support for the website version: network first (so updates to the
 // Excel file show up), falling back to the cached copy when offline.
-const CACHE = "shabdavali-v1";
+const CACHE = "shabdavali-v2";
 const FILES = ["./", "index.html", "style.css", "app.js", "xlsx-reader.js", "inflate.js",
   "Official_Hindi_Words_English_Meanings.xlsx", "manifest.webmanifest",
   "icons/icon.svg", "icons/icon-192.png", "icons/icon-512.png"];
