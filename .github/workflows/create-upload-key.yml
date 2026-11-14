@@ -1,0 +1,138 @@
+# Creates your private UPLOAD KEY for Google Play (run this ONCE).
+#
+# Before running: add a repository secret named UPLOAD_KEYSTORE_PASSWORD
+#   (Settings → Secrets and variables → Actions → New repository secret).
+#   Use a strong password of at least 12 characters and write it down; it cannot be recovered.
+#
+# Then: Actions tab → "Create Play Store upload key" → Run workflow.
+# The result is a password-protected zip (upload-key.zip, same password) that you can
+# download from the run page for 1 day. It holds:
+#   upload-keystore.jks          the key itself: keep a safe copy, never put it in the repository
+#   upload-keystore-base64.txt   the same key as text, to paste into the UPLOAD_KEYSTORE_BASE64 secret
+#   key-details.txt              alias and fingerprints, for your records
+# Open the zip with 7-Zip (Windows), Keka/The Unarchiver (Mac) or ZArchiver (Android).
+
+name: Create Play Store upload key
+
+on:
+  workflow_dispatch:
+    inputs:
+      your_name:
+        description: "Your name or the developer name (stored inside the key)"
+        required: true
+      organisation:
+        description: "Organisation (optional)"
+        required: false
+        default: ""
+      city:
+        description: "City"
+        required: true
+      state:
+        description: "State"
+        required: true
+      country_code:
+        description: "Two-letter country code"
+        required: true
+        default: "IN"
+      replace_existing_key:
+        description: "Make a new key even though UPLOAD_KEYSTORE_BASE64 is already set (only if you really mean to)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  create-key:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Check the password secret
+        env:
+          PW: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          EXISTING: ${{ secrets.UPLOAD_KEYSTORE_BASE64 }}
+          REPLACE: ${{ inputs.replace_existing_key }}
+        run: |
+          if [ -z "$PW" ]; then
+            echo "::error::Add the repository secret UPLOAD_KEYSTORE_PASSWORD first (Settings → Secrets and variables → Actions)."
+            exit 1
+          fi
+          if [ "${#PW}" -lt 12 ]; then
+            echo "::error::UPLOAD_KEYSTORE_PASSWORD is too short. Use at least 12 characters."
+            exit 1
+          fi
+          if [ -n "$EXISTING" ] && [ "$REPLACE" != "true" ]; then
+            echo "::error::An upload key is already saved in UPLOAD_KEYSTORE_BASE64. Google Play only accepts bundles signed with that key, so a new one is not made. To make one anyway, run again with 'replace_existing_key' ticked."
+            exit 1
+          fi
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Create the key
+        env:
+          PW: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+          IN_NAME: ${{ inputs.your_name }}
+          IN_ORG: ${{ inputs.organisation }}
+          IN_CITY: ${{ inputs.city }}
+          IN_STATE: ${{ inputs.state }}
+          IN_COUNTRY: ${{ inputs.country_code }}
+        run: |
+          set -euo pipefail
+          clean() { printf '%s' "$1" | tr -d ',"=+<>#;\\' | sed 's/^ *//; s/ *$//'; }
+          CN="$(clean "$IN_NAME")"; O="$(clean "$IN_ORG")"; L="$(clean "$IN_CITY")"; ST="$(clean "$IN_STATE")"
+          C="$(clean "$IN_COUNTRY" | tr '[:lower:]' '[:upper:]' | cut -c1-2)"
+          DNAME="CN=${CN}, OU=${O:-${CN}}, O=${O:-${CN}}, L=${L}, ST=${ST}, C=${C}"
+          mkdir -p key && cd key
+          keytool -genkeypair -noprompt \
+            -keystore upload-keystore.jks -storetype PKCS12 \
+            -alias upload -keyalg RSA -keysize 2048 -validity 10000 \
+            -storepass "$PW" -keypass "$PW" -dname "$DNAME"
+          base64 -w 0 upload-keystore.jks > upload-keystore-base64.txt
+          {
+            echo "Google Play upload key — प्रशासनिक शब्दावली"
+            echo "Created: $(date -u '+%Y-%m-%d %H:%M UTC') by workflow run ${GITHUB_RUN_ID}"
+            echo "Key alias: upload"
+            echo "Password: the one in your UPLOAD_KEYSTORE_PASSWORD secret (same for the file and the key)"
+            echo "Owner: $DNAME"
+            echo
+            keytool -list -v -keystore upload-keystore.jks -storepass "$PW" -alias upload | grep -E "Valid|SHA1:|SHA256:"
+            echo
+            echo "Next steps:"
+            echo "1. Keep upload-keystore.jks and its password safe (for example in two places)."
+            echo "2. Open upload-keystore-base64.txt, copy ALL the text and save it as a new repository"
+            echo "   secret named UPLOAD_KEYSTORE_BASE64."
+            echo "3. Run the 'Build Play Store bundle (.aab)' workflow."
+          } > key-details.txt
+
+      - name: Put the key in a password-protected zip
+        env:
+          PW: ${{ secrets.UPLOAD_KEYSTORE_PASSWORD }}
+        run: |
+          set -euo pipefail
+          command -v 7z >/dev/null || { sudo apt-get update -qq && sudo apt-get install -y -qq p7zip-full; }
+          cd key
+          7z a -tzip -mem=AES256 -p"$PW" ../upload-key.zip upload-keystore.jks upload-keystore-base64.txt key-details.txt > /dev/null
+          cd .. && rm -rf key
+          7z t -p"$PW" upload-key.zip > /dev/null && echo "Zip checked: OK"
+
+      - name: Offer the zip for download (1 day)
+        uses: actions/upload-artifact@v4
+        with:
+          name: upload-key
+          path: upload-key.zip
+          retention-days: 1
+
+      - name: What to do next
+        run: |
+          cat >> "$GITHUB_STEP_SUMMARY" <<'EOF'
+          ## Upload key created
+
+          1. Scroll down to **Artifacts** on this page and download **upload-key** (available for 1 day).
+          2. Open `upload-key.zip` with your `UPLOAD_KEYSTORE_PASSWORD` (7-Zip on Windows, Keka on Mac, ZArchiver on Android).
+          3. Keep `upload-keystore.jks` and the password somewhere safe. **Do not upload it to the repository.**
+          4. Copy all the text in `upload-keystore-base64.txt` into a new repository secret named **UPLOAD_KEYSTORE_BASE64**.
+          5. Delete this run's artifact if you like (bin icon next to it), then run **Build Play Store bundle (.aab)**.
+          EOF
