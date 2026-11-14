@@ -3,6 +3,8 @@
     <style name="AppTheme" parent="@android:style/Theme.Material.Light.NoActionBar">
         <item name="android:statusBarColor">#5B2A12</item>
         <item name="android:navigationBarColor">#FFFFFF</item>
+        <!-- Dark navigation-bar icons, so they show on the white bar (Android 8.1+). -->
+        <item name="android:windowLightNavigationBar">true</item>
         <item name="android:windowBackground">@color/sand</item>
         <item name="android:colorPrimary">#5B2A12</item>
         <item name="android:colorAccent">#C08A2D</item>

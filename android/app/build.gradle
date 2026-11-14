@@ -20,7 +20,9 @@ copy {
     into new File(webAssetsDir, "www")
 }
 
-// Signing key (android/keystore). Keeping the same key lets each new APK install over the old one.
+// Signing key. The APK on the Releases page uses the key in android/keystore (its password is
+// public, which is fine for a direct-download APK). The Play Store bundle is signed instead with
+// your private upload key, passed in through the ANDROID_* settings by build-play-bundle.yml.
 def ksFile = System.getenv("ANDROID_KEYSTORE_PATH") ?: rootProject.file("keystore/shabdavali.jks").path
 def ksPass = System.getenv("ANDROID_KEYSTORE_PASSWORD") ?: "shabdavali123"
 def keyAliasName = System.getenv("ANDROID_KEY_ALIAS") ?: "shabdavali"
@@ -28,15 +30,17 @@ def keyPass = System.getenv("ANDROID_KEY_PASSWORD") ?: "shabdavali123"
 
 android {
     namespace "com.prashasnik.shabdavali"
-    compileSdk 35
+    compileSdk 36
 
     defaultConfig {
         applicationId "com.prashasnik.shabdavali"
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         // Each GitHub build gets a higher version, so a new APK installs over the old one.
-        versionCode((System.getenv("GITHUB_RUN_NUMBER") ?: "1").toInteger())
-        versionName "1." + (System.getenv("GITHUB_RUN_NUMBER") ?: "0")
+        // The Play Store build sets APP_VERSION_CODE itself (see build-play-bundle.yml).
+        def buildNo = System.getenv("APP_VERSION_CODE") ?: System.getenv("GITHUB_RUN_NUMBER") ?: "1"
+        versionCode buildNo.toInteger()
+        versionName "1." + buildNo
     }
 
     signingConfigs {
