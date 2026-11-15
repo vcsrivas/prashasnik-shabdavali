@@ -29,7 +29,7 @@ def keyAliasName = System.getenv("ANDROID_KEY_ALIAS") ?: "shabdavali"
 def keyPass = System.getenv("ANDROID_KEY_PASSWORD") ?: "shabdavali123"
 
 android {
-    namespace "com.prashasanik.shabdavali"
+    namespace "com.prashasnik.shabdavali"
     compileSdk 36
 
     defaultConfig {
